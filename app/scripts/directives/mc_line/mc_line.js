@@ -10,13 +10,16 @@ angular.module('d3App').directive('mcLinechart', [ '$interval', function($interv
     link: function(scope, element) {
       var container = angular.element(element[0]).find('svg')[0];
 
+      var xCallback = function(d) { return d.x };
+      var yCallback = function(d) { return d.y };
+
       var xRange = d3
         .scale
         .linear()
         .range([ scope.styles.borders.left, scope.styles.width - scope.styles.borders.right ])
         .domain([
-          d3.min(scope.data, function(d) { return d.x }),
-          d3.max(scope.data, function(d) { return d.x })
+          d3.min(scope.data, xCallback),
+          d3.max(scope.data, xCallback)
         ]);
 
       var yRange = d3
@@ -24,8 +27,8 @@ angular.module('d3App').directive('mcLinechart', [ '$interval', function($interv
         .linear()
         .range([ scope.styles.height - scope.styles.borders.top, scope.styles.borders.bottom ])
         .domain([
-          d3.min(scope.data, function(d) { return d.y }),
-          d3.max(scope.data, function(d) { return d.y })
+          d3.min(scope.data, yCallback),
+          d3.max(scope.data, yCallback)
         ]);
 
       var xAxis = d3
@@ -48,7 +51,7 @@ angular.module('d3App').directive('mcLinechart', [ '$interval', function($interv
         .line()
         .x(function(d) { return xRange(d.x); })
         .y(function(d) { return yRange(d.y); })
-        .interpolate('linear');
+        .interpolate(scope.styles.type);
 
       d3.select(container)
         .append('svg:g')
@@ -70,13 +73,38 @@ angular.module('d3App').directive('mcLinechart', [ '$interval', function($interv
         .attr('stroke-width', scope.styles.stroke)
         .attr('fill', 'none', scope.styles.fill);
 
-      $interval(function() {
-        d3.select(container)
-          .transition()
-          .select('.line')
-          .duration(250)
-          .attr('d', line(scope.data));
-      }, scope.duration);
+      if(scope.duration > 0) {
+        $interval(function() {
+
+          xRange.domain([
+            d3.min(scope.data, xCallback),
+            d3.max(scope.data, xCallback)
+          ]);
+
+          yRange.domain([
+            d3.min(scope.data, yCallback),
+            d3.max(scope.data, yCallback)
+          ]);
+
+          d3.select(container)
+            .transition()
+            .select('.x.axis')
+            .duration(scope.duration)
+            .call(xAxis);
+
+          d3.select(container)
+            .transition()
+            .select('.y.axis')
+            .duration(scope.duration)
+            .call(yAxis);
+
+          d3.select(container)
+            .transition()
+            .select('.line')
+            .duration(scope.duration)
+            .attr('d', line(scope.data));
+        }, scope.duration);
+      }
     }
   }
 }]);
