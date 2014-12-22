@@ -3,8 +3,9 @@ angular.module('d3App').directive('mcLinechart', [ '$interval', function($interv
     restrict: 'E',
     templateUrl: 'app/scripts/directives/mc_line/mc_line.html',
     scope: {
-      data : '=',
-      styles: '=',
+      data :    '=',
+      styles:   '=',
+      duration: '='
     },
     link: function(scope, element) {
       var container = angular.element(element[0]).find('svg')[0];
@@ -75,7 +76,7 @@ angular.module('d3App').directive('mcLinechart', [ '$interval', function($interv
           .select('.line')
           .duration(250)
           .attr('d', line(scope.data));
-      }, 250);
+      }, scope.duration);
     }
   }
 }]);

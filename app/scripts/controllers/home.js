@@ -12,7 +12,7 @@ angular.module('d3App').controller('HomeCtrl', [
         { x: 80,  y: $scope.rand(20, 60) },
         { x: 100, y: $scope.rand(20, 60) }
       ]
-    }, 250);
+    }, 500);
 
     $scope.rand = function(min, max) {
       return Math.floor(Math.random()*(max-min+1)+min);
